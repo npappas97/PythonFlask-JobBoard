@@ -23,7 +23,6 @@ def execute_sql(sql, values=(), commit=False, single=False):
         results = connection.commit()
     else:
         results = cursor.fetchone() if single else cursor.fetchall()
-
     cursor.close()
     return results
 
@@ -40,3 +39,9 @@ def close_connection(exception):
 def jobs():
     jobs = execute_sql('SELECT job.id, job.title, job.description, job.salary, employer.id as employer_id, employer.name as employer_name FROM job JOIN employer ON employer.id = job.employer_id')
     return render_template('index.html', jobs=jobs)
+
+
+@app.route('/job/<job_id>')
+def job(job_id):
+    jobs = execute_sql('SELECT job.id, job.title, job.description, job.salary, employer.id as employer_id, employer.name as employer_name FROM job JOIN employer ON employer.id = job.employer_id WHERE job.id = ?', [job_id], single=True)
+    return render_template('job.html', job=job)
